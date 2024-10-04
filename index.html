@@ -73,9 +73,9 @@
     const confessionsKey = 'confessions';
     let username = '';
 
-    // Load existing confessions from session storage
+    // Load existing confessions from local storage
     function loadConfessions() {
-        const confessions = JSON.parse(sessionStorage.getItem(confessionsKey)) || [];
+        const confessions = JSON.parse(localStorage.getItem(confessionsKey)) || [];
         const confessionList = document.getElementById('confessionsList');
         confessionList.innerHTML = ''; // Clear existing list
         confessions.forEach(confession => {
@@ -99,9 +99,9 @@
     function submitConfession() {
         const confessionText = document.getElementById('confessionText').value;
         if (confessionText) {
-            const confessions = JSON.parse(sessionStorage.getItem(confessionsKey)) || [];
+            const confessions = JSON.parse(localStorage.getItem(confessionsKey)) || [];
             confessions.push({ username, text: confessionText });
-            sessionStorage.setItem(confessionsKey, JSON.stringify(confessions));
+            localStorage.setItem(confessionsKey, JSON.stringify(confessions));
             document.getElementById('confessionText').value = ''; // Clear input
             loadConfessions(); // Reload confessions
         } else {
