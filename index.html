@@ -4,18 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confession Booth</title>
-    <!-- Include Firebase libraries -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Your HTML content goes here -->
+        <div id="loginSection">
+            <h1>Login</h1>
+            <input type="text" id="username" placeholder="Enter your name" />
+            <button onclick="login()">Log In</button>
+        </div>
+
+        <div id="confessionSection" class="hidden" style="display: none;">
+            <h2>Confession Booth</h2>
+            <textarea id="confessionText" placeholder="Enter your confession"></textarea>
+            <button onclick="submitConfession()">Submit Confession</button>
+            <h3>Past Confessions:</h3>
+            <div id="confessionsList"></div>
+        </div>
     </div>
 
     <script>
-        // Firebase configuration
-      const firebaseConfig = {
+     const firebaseConfig = {
   apiKey: "AIzaSyB2Y0xfYW3EfwbPlECRK19brbVKXQRPzOY",
   authDomain: "saturn-confess-wall.firebaseapp.com",
   databaseURL: "https://saturn-confess-wall-default-rtdb.firebaseio.com",
@@ -25,12 +35,10 @@
   appId: "1:218131414831:web:7559530e353ddd93acabda",
         };
 
-        // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Declare the username variable at the top level
-        let username = ''; // Accessible to all functions
+        let username = '';
 
         function loadConfessions() {
             const confessionsList = document.getElementById('confessionsList');
@@ -47,9 +55,9 @@
         function login() {
             const nameInput = document.getElementById('username').value;
             if (nameInput) {
-                username = nameInput; // Assign the input value to the username variable
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('confessionSection').classList.remove('hidden');
+                username = nameInput;
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('confessionSection').style.display = 'block';
                 document.getElementById('confessionText').focus();
                 loadConfessions(); // Load confessions after logging in
             } else {
@@ -61,7 +69,7 @@
             const confessionText = document.getElementById('confessionText').value;
             if (confessionText) {
                 const confession = {
-                    username: username, // Use the initialized username
+                    username: username,
                     text: confessionText
                 };
                 database.ref('confessions/').push(confession);
@@ -72,8 +80,7 @@
             }
         }
 
-        // Load confessions when the page is loaded
-        window.onload = loadConfessions;
+        window.onload = loadConfessions; // Load confessions when the page is loaded
     </script>
 </body>
 </html>
