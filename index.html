@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confession Booth</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -70,16 +72,32 @@
 </div>
 
 <script>
-    const confessionsKey = 'confessions';
+    // Your web app's Firebase configuration (replace with your Firebase project's config)
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
     let username = '';
 
-    // Load existing confessions from local storage
     function loadConfessions() {
-        const confessions = JSON.parse(localStorage.getItem(confessionsKey)) || [];
-        const confessionList = document.getElementById('confessionsList');
-        confessionList.innerHTML = ''; // Clear existing list
-        confessions.forEach(confession => {
-            confessionList.innerHTML += `<p><strong>${confession.username}:</strong> ${confession.text}</p>`;
+        const confessionsList = document.getElementById('confessionsList');
+        confessionsList.innerHTML = ''; // Clear existing list
+
+        database.ref('confessions/').once('value').then(snapshot => {
+            snapshot.forEach(childSnapshot => {
+                const confession = childSnapshot.val();
+                confessionsList.innerHTML += `<p><strong>${confession.username}:</strong> ${confession.text}</p>`;
+            });
         });
     }
 
@@ -99,9 +117,11 @@
     function submitConfession() {
         const confessionText = document.getElementById('confessionText').value;
         if (confessionText) {
-            const confessions = JSON.parse(localStorage.getItem(confessionsKey)) || [];
-            confessions.push({ username, text: confessionText });
-            localStorage.setItem(confessionsKey, JSON.stringify(confessions));
+            const confession = {
+                username: username,
+                text: confessionText
+            };
+            database.ref('confessions/').push(confession);
             document.getElementById('confessionText').value = ''; // Clear input
             loadConfessions(); // Reload confessions
         } else {
