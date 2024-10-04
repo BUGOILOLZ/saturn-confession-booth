@@ -4,103 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confession Booth</title>
+    <!-- Include Firebase libraries -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-        }
-        .hidden {
-            display: none;
-        }
-        textarea {
-            width: 100%;
-            height: 100px;
-            margin-top: 10px;
-        }
-        button {
-            background: #007BFF;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        #confessionsList {
-            margin-top: 20px;
-            padding: 10px;
-            border-top: 1px solid #ccc;
-        }
-    </style>
 </head>
 <body>
-
-<div class="container">
-    <h1>Confession Booth</h1>
-    
-    <div id="loginSection">
-        <label for="username">Enter your name:</label>
-        <input type="text" id="username" required>
-        <button onclick="login()">Login</button>
+    <div class="container">
+        <!-- Your HTML content goes here -->
     </div>
 
-    <div id="confessionSection" class="hidden">
-        <h2>Your Confession</h2>
-        <textarea id="confessionText" placeholder="Confess your thoughts..."></textarea>
-        <button onclick="submitConfession()">Submit Confession</button>
-        
-        <div id="confessionsList"></div>
-    </div>
-</div>
-
-<script>
-    // Your web app's Firebase configuration
-const firebaseConfig = {
+    <script>
+        // Firebase configuration
+      const firebaseConfig = {
   apiKey: "AIzaSyB2Y0xfYW3EfwbPlECRK19brbVKXQRPzOY",
   authDomain: "saturn-confess-wall.firebaseapp.com",
   databaseURL: "https://saturn-confess-wall-default-rtdb.firebaseio.com",
   projectId: "saturn-confess-wall",
   storageBucket: "saturn-confess-wall.appspot.com",
   messagingSenderId: "218131414831",
-  appId: "1:218131414831:web:7559530e353ddd93acabda",  measurementId: "G-WDX1B05HEY"
-};
-    // Initialize Firebase
-   const app = firebase.initializeApp(firebaseConfig);
-   const database = firebase.database();
+  appId: "1:218131414831:web:7559530e353ddd93acabda",
+        };
 
-   // Declare the username variable at the top level
-   let username = ''; // Accessible to all functions
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-   function loadConfessions() {
-       // Function to load confessions from the database
-   }
+        // Declare the username variable at the top level
+        let username = ''; // Accessible to all functions
 
-   function login() {
-       // Login logic
-   }
+        function loadConfessions() {
+            const confessionsList = document.getElementById('confessionsList');
+            confessionsList.innerHTML = ''; // Clear existing list
 
-   function submitConfession() {
-       // Submission logic
-   }
+            database.ref('confessions/').once('value').then(snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const confession = childSnapshot.val();
+                    confessionsList.innerHTML += `<p><strong>${confession.username}:</strong> ${confession.text}</p>`;
+                });
+            });
+        }
 
-   // Load confessions when the page is loaded
-   window.onload = loadConfessions;
-</script>
+        function login() {
+            const nameInput = document.getElementById('username').value;
+            if (nameInput) {
+                username = nameInput; // Assign the input value to the username variable
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('confessionSection').classList.remove('hidden');
+                document.getElementById('confessionText').focus();
+                loadConfessions(); // Load confessions after logging in
+            } else {
+                alert('Please enter a name!');
+            }
+        }
+
+        function submitConfession() {
+            const confessionText = document.getElementById('confessionText').value;
+            if (confessionText) {
+                const confession = {
+                    username: username, // Use the initialized username
+                    text: confessionText
+                };
+                database.ref('confessions/').push(confession);
+                document.getElementById('confessionText').value = ''; // Clear input
+                loadConfessions(); // Reload confessions
+            } else {
+                alert('Please enter a confession!');
+            }
+        }
+
+        // Load confessions when the page is loaded
+        window.onload = loadConfessions;
+    </script>
+</body>
+</html>
