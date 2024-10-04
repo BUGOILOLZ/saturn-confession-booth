@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confession Booth</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-top: 10px;
+        }
+        button {
+            background: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #confessionsList {
+            margin-top: 20px;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Confession Booth</h1>
+    
+    <div id="loginSection">
+        <label for="username">Enter your name:</label>
+        <input type="text" id="username" required>
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="confessionSection" class="hidden">
+        <h2>Your Confession</h2>
+        <textarea id="confessionText" placeholder="Confess your thoughts..."></textarea>
+        <button onclick="submitConfession()">Submit Confession</button>
+        
+        <div id="confessionsList"></div>
+    </div>
+</div>
+
+<script>
+    const confessionsKey = 'confessions';
+    let username = '';
+
+    // Load existing confessions from local storage
+    function loadConfessions() {
+        const confessions = JSON.parse(localStorage.getItem(confessionsKey)) || [];
+        const confessionList = document.getElementById('confessionsList');
+        confessionList.innerHTML = ''; // Clear existing list
+        confessions.forEach(confession => {
+            confessionList.innerHTML += `<p><strong>${confession.username}:</strong> ${confession.text}</p>`;
+        });
+    }
+
+    function login() {
+        const nameInput = document.getElementById('username').value;
+        if (nameInput) {
+            username = nameInput;
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('confessionSection').classList.remove('hidden');
+            document.getElementById('confessionText').focus();
+            loadConfessions(); // Load confessions after logging in
+        } else {
+            alert('Please enter a name!');
+        }
+    }
+
+    function submitConfession() {
+        const confessionText = document.getElementById('confessionText').value;
+        if (confessionText) {
+            const confessions = JSON.parse(localStorage.getItem(confessionsKey)) || [];
+            confessions.push({ username, text: confessionText });
+            localStorage.setItem(confessionsKey, JSON.stringify(confessions));
+            document.getElementById('confessionText').value = ''; // Clear input
+            loadConfessions(); // Reload confessions
+        } else {
+            alert('Please enter a confession!');
+        }
+    }
+
+    // Load confessions when the page is loaded
+    window.onload = loadConfessions;
+
+</script>
+
+</body>
+</html>
