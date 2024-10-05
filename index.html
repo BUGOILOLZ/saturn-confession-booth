@@ -4,51 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confession Booth</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-</head>
-<body>
-    <div class="container">
-        <div id="loginSection">
-            <h1>Login</h1>
-            <input type="text" id="username" placeholder="Enter your name" />
-            <button onclick="login()">Log In</button>
-        </div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+        import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
-        <div id="confessionSection" class="hidden" style="display: none;">
-            <h2>Confession Booth</h2>
-            <textarea id="confessionText" placeholder="Enter your confession"></textarea>
-            <button onclick="submitConfession()">Submit Confession</button>
-            <h3>Past Confessions:</h3>
-            <div id="confessionsList"></div>
-        </div>
-    </div>
-
-    <script>
-     const firebaseConfig = {
-  apiKey: "AIzaSyB2Y0xfYW3EfwbPlECRK19brbVKXQRPzOY",
-  authDomain: "saturn-confess-wall.firebaseapp.com",
-  databaseURL: "https://saturn-confess-wall-default-rtdb.firebaseio.com",
-  projectId: "saturn-confess-wall",
-  storageBucket: "saturn-confess-wall.appspot.com",
-  messagingSenderId: "218131414831",
-  appId: "1:218131414831:web:7559530e353ddd93acabda",
+        const firebaseConfig = {
+            apiKey: "AIzaSyAp2jBg5GBR2X1z-2VIqNMapIubj_LIoWI"
+            authDomain: "saturn-3c9c0.firebaseapp.com",
+            databaseURL: "https://saturn-3c9c0-default-rtdb.firebaseio.com/",
+            projectId: "saturn-3c9c0",
+            storageBucket: "saturn-3c9c0.appspot.com",
+            messagingSenderId: "426141071762",
+            appId: "1:426141071762:web:f59115cad95ee27851294b",
         };
 
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
         let username = '';
 
         function loadConfessions() {
             const confessionsList = document.getElementById('confessionsList');
             confessionsList.innerHTML = ''; // Clear existing list
 
-            database.ref('confessions/').once('value').then(snapshot => {
-                snapshot.forEach(childSnapshot => {
-                    const confession = childSnapshot.val();
-                    confessionsList.innerHTML += `<p><strong>${confession.username}:</strong> ${confession.text}</p>`;
-                });
+            const confessionsRef = ref(database, 'confessions/');
+            get(confessionsRef).then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const confession = childSnapshot.val();
+                        confessionsList.innerHTML += `<p><strong>${confession.username}:</strong> ${confession.text}</p>`;
+                    });
+                }
             });
         }
 
@@ -72,7 +57,8 @@
                     username: username,
                     text: confessionText
                 };
-                database.ref('confessions/').push(confession);
+                const confessionsRef = ref(database, 'confessions/');
+                set(ref(confessionsRef, Date.now()), confession);
                 document.getElementById('confessionText').value = ''; // Clear input
                 loadConfessions(); // Reload confessions
             } else {
@@ -82,5 +68,22 @@
 
         window.onload = loadConfessions; // Load confessions when the page is loaded
     </script>
+</head>
+<body>
+    <div class="container">
+        <div id="loginSection">
+            <h1>Login</h1>
+            <input type="text" id="username" placeholder="Enter your name" />
+            <button onclick="login()">Log In</button>
+        </div>
+
+        <div id="confessionSection" class="hidden" style="display: none;">
+            <h2>Confession Booth</h2>
+            <textarea id="confessionText" placeholder="Enter your confession"></textarea>
+            <button onclick="submitConfession()">Submit Confession</button>
+            <h3>Past Confessions:</h3>
+            <div id="confessionsList"></div>
+        </div>
+    </div>
 </body>
 </html>
