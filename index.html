@@ -70,6 +70,12 @@
         }
 
         window.onload = loadConfessions; // Load confessions when the page is loaded
+
+        // Add event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('loginButton').addEventListener('click', login);
+            document.getElementById('submitButton').addEventListener('click', submitConfession);
+        });
     </script>
 </head>
 <body>
@@ -77,16 +83,12 @@
         <div id="loginSection">
             <h1>Login</h1>
             <input type="text" id="username" placeholder="Enter your name" />
-            <button onclick="login()">Log In</button>
+            <button id="loginButton">Log In</button>
         </div>
 
         <div id="confessionSection" class="hidden" style="display: none;">
             <h2>Confession Booth</h2>
             <textarea id="confessionText" placeholder="Enter your confession"></textarea>
-            <button onclick="submitConfession()">Submit Confession</button>
+            <button id="submitButton">Submit Confession</button>
             <h3>Past Confessions:</h3>
-            <div id="confessionsList"></div>
-        </div>
-    </div>
-</body>
-</html>
+           
